@@ -1,3 +1,6 @@
 photos/
 programs/
 output*
+*.e4p
+.eric6project/
+__pycache__
