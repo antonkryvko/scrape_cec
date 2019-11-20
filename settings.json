@@ -1,0 +1,126 @@
+{
+    "2019": {
+        "elections": {
+            "parliamentary": {
+                "constituencies": {
+                    "START_URL": "'https://www.cvk.gov.ua/pls/vnd2019/wp032pt001f01=919.html'",
+                    "CURRENT_ELECTION_URL": "'https://www.cvk.gov.ua/pls/vnd2019/'",
+                    "PATH_TO_LOCATION_WITH_PHOTOS": "'2019/constituencies/photos/'",
+                    "PATH_TO_LOCATION_WITH_PROGRAMS": "'2019/constituencies/programs/'",
+                    "SELECT_DISTRICTS": "'td.cntr:nth-of-type(2) > a.a2'",
+                    "SELECT_CANDIDATES_ON_DISTRICTS": "'td.cntr:nth-of-type(1) > a.a2'",
+                    "SELECT_CANDIDATE_FULLNAME": "'h1'",
+                    "SELECT_CANDIDATE_INFO_FROM_TABLE": "'table tr > td:nth-of-type(2)'",
+                    "SELECT_ELECTION_PROGRAM": "'table tr > td:nth-of-type(2) > a.a1'",
+                    "SELECT_TRUSTEES_INFO": "'table tr > td:nth-of-type(2) > a.a2'",
+                    "NUMBER_OF_ROWS_IN_TABLE": "7",
+                    "START_DISTRICT": "11",
+                    "OUTPUT_FILENAME": "'2019_constituencies_candidates.csv'"
+                },
+                "party_lists": {
+                    "START_URL": "'https://www.cvk.gov.ua/pls/vnd2019/wp400pt001f01=919.html'",
+                    "CURRENT_ELECTION_URL": "'https://www.cvk.gov.ua/pls/vnd2019/'",
+                    "SELECT_PARTY_LISTS": "'td.cntr:nth-of-type(4) > a.a2'",
+                    "SELECT_PARTY_PROGRAMS": "'td.cntr:nth-of-type(5) > a.a2'",
+                    "SELECT_PARTY_CANDIDATES": "'td:nth-of-type(2) > a.a2'",
+                    "PATH_TO_LOCATION_WITH_PROGRAMS": "'2019/parties/programs/'",
+                    "PATH_TO_LOCATION_WITH_PHOTOS": "'2019/parties/photos/'",
+                    "SELECT_CANDIDATE_FULLNAME": "'h1'",
+                    "SELECT_CANDIDATE_INFO_FROM_TABLE": "'table tr > td:nth-of-type(2)'",
+                    "SELECT_ELECTION_PROGRAM": "'table tr > td:nth-of-type(2) > a.a1'",
+                    "SELECT_TRUSTEES_INFO": "'table tr > td:nth-of-type(2) > a.a2'",
+                    "NUMBER_OF_ROWS_IN_TABLE": "5",
+                    "OUTPUT_FILENAME": "'2019_party_candidates.csv'"
+                }
+            },
+            "presedential": {
+            }
+        }
+    },
+    "2015": {
+        "elections": {
+            "local": {
+            }
+        }
+    },
+    "2014": {
+        "elections": {
+            "parliamentary": {
+                "constituencies": {
+                    "START_URL": "'https://www.cvk.gov.ua/pls/vnd2014/wp032pt001f01=910.html'",
+                    "CURRENT_ELECTION_URL": "'https://www.cvk.gov.ua/pls/vnd2014'",
+                    "PATH_TO_LOCATION_WITH_PHOTOS": "'2014/constituencies/photos/'",
+                    "PATH_TO_LOCATION_WITH_PROGRAMS": "'2014/constituencies/programs/'",
+                    "SELECT_DISTRICTS": "'td.td2:nth-of-type(2) > a.a1'",
+                    "SELECT_CANDIDATES_ON_DISTRICTS": "'td.td2:nth-of-type(1) > a.a1'",
+                    "SELECT_CANDIDATE_FULLNAME": "'h2'",
+                    "SELECT_CANDIDATE_INFO_FROM_TABLE": "'table tr > td.td2'",
+                    "SELECT_ELECTION_PROGRAM": "'table tr > td:nth-of-type(2) > a.a1small'",
+                    "SELECT_TRUSTEES_INFO": "'table tr > td:nth-of-type(2) > a.a2'",
+                    "NUMBER_OF_ROWS_IN_TABLE": "13",
+                    "START_DISTRICT": "11",
+                    "OUTPUT_FILENAME": "'2014_constituencies_candidates.csv'"
+                },
+                "party_lists": {
+                },
+            }
+            "presedential": {
+            }
+        }
+    },
+    "2012": {
+        "elections": {
+            "parliamentary": {
+                "constituencies": {
+                    "START_URL": "'https://cvk.gov.ua/pls/vnd2012/wp032ad94.html?PT001F01=900'",
+                    "CURRENT_ELECTION_URL": "'https://www.cvk.gov.ua/pls/vnd2012/'",
+                    "PATH_TO_LOCATION_WITH_PHOTOS": "'2012/constituencies/photos/'",
+                    "PATH_TO_LOCATION_WITH_PROGRAMS": "'2012/constituencies/programs/'",
+                    "SELECT_DISTRICTS": "'td.td2:nth-of-type(2) > a.a1'",
+                    "SELECT_CANDIDATES_ON_DISTRICTS": "'td.td2:nth-of-type(1) > a.a1'",
+                    "SELECT_CANDIDATE_FULLNAME": "'h2'",
+                    "SELECT_CANDIDATE_INFO_FROM_TABLE": "'table tr > td.td2'",
+                    "SELECT_ELECTION_PROGRAM": "'table tr > td:nth-of-type(2) > a.a1small:nth-of-type(2)'",
+                    "SELECT_TRUSTEES_INFO": "'table tr > td:nth-of-type(2) > a.a2'",
+                    "NUMBER_OF_ROWS_IN_TABLE": "13",
+                    "START_DISTRICT": "1",
+                    "OUTPUT_FILENAME": "'2012_constituencies_candidates.csv'"
+                }
+                "party_lists": {
+                },
+            }
+            "presedential": {
+            }
+        }
+    },
+    "2010": {
+        "elections": {
+            "presedential": {
+                },
+            "local": {
+            },
+        }
+    },
+    "2007": {
+        "elections": {
+            "parliamentary": {
+                "party_lists": {
+                }
+            }
+        }
+    },
+    "2006": {
+        "elections": {
+            "parliamentary": {
+                "party_lists": {
+                }
+            }
+        }
+    },
+    "2004": {
+        "elections": {
+            "presedential": {
+            }
+        }
+    }
+}

@@ -1,6 +1,11 @@
-photos/
-programs/
-output*
+2019*
+2015*
+2014*
+2012*
+2010*
+2007*
+2006*
+2004*
 *.e4p
 .eric6project/
 __pycache__
