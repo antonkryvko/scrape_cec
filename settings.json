@@ -15,7 +15,7 @@
                     "SELECT_TRUSTEES_INFO": "'table tr > td:nth-of-type(2) > a.a2'",
                     "NUMBER_OF_ROWS_IN_TABLE": "7",
                     "START_DISTRICT": "11",
-                    "OUTPUT_FILENAME": "'2019_constituencies_candidates.csv'"
+                    "OUTPUT_FILENAME": "'2019/constituencies/2019_constituencies_candidates.csv'"
                 },
                 "party_lists": {
                     "START_URL": "'https://www.cvk.gov.ua/pls/vnd2019/wp400pt001f01=919.html'",
@@ -30,7 +30,7 @@
                     "SELECT_ELECTION_PROGRAM": "'table tr > td:nth-of-type(2) > a.a1'",
                     "SELECT_TRUSTEES_INFO": "'table tr > td:nth-of-type(2) > a.a2'",
                     "NUMBER_OF_ROWS_IN_TABLE": "5",
-                    "OUTPUT_FILENAME": "'2019_party_candidates.csv'"
+                    "OUTPUT_FILENAME": "'2019/parties/2019_party_candidates.csv'"
                 }
             },
             "presedential": {
@@ -59,7 +59,7 @@
                     "SELECT_TRUSTEES_INFO": "'table tr > td:nth-of-type(2) > a.a2'",
                     "NUMBER_OF_ROWS_IN_TABLE": "13",
                     "START_DISTRICT": "11",
-                    "OUTPUT_FILENAME": "'2014_constituencies_candidates.csv'"
+                    "OUTPUT_FILENAME": "'2014/constituencies/2014_constituencies_candidates.csv'"
                 },
                 "party_lists": {
                 },
@@ -84,7 +84,7 @@
                     "SELECT_TRUSTEES_INFO": "'table tr > td:nth-of-type(2) > a.a2'",
                     "NUMBER_OF_ROWS_IN_TABLE": "13",
                     "START_DISTRICT": "1",
-                    "OUTPUT_FILENAME": "'2012_constituencies_candidates.csv'"
+                    "OUTPUT_FILENAME": "'2012/constituencies/2012_constituencies_candidates.csv'"
                 }
                 "party_lists": {
                 },

@@ -24,7 +24,7 @@ SELECT_ELECTION_PROGRAM = 'table tr > td:nth-of-type(2) > a.a1'
 SELECT_TRUSTEES_INFO = 'table tr > td:nth-of-type(2) > a.a2'
 NUMBER_OF_ROWS_IN_TABLE = 7
 START_DISTRICT = 11
-OUTPUT_FILENAME = '2019_candidates.csv'
+OUTPUT_FILENAME = '2019/constituencies/2019_constituencies_candidates.csv'
 
 TITLE_FULLNAME = 'ПІБ'
 TITLE_DISTRICT = 'Округ'

@@ -24,7 +24,7 @@ SELECT_CANDIDATE_INFO_FROM_TABLE = 'table tr > td:nth-of-type(2)'
 SELECT_ELECTION_PROGRAM = 'table tr > td:nth-of-type(2) > a.a1'
 SELECT_TRUSTEES_INFO = 'table tr > td:nth-of-type(2) > a.a2'
 NUMBER_OF_ROWS_IN_TABLE = 5
-OUTPUT_FILENAME = '2019_party_candidates.csv'
+OUTPUT_FILENAME = '2019/parties/2019_party_candidates.csv'
 
 TITLE_PARTY = 'Партія'
 TITLE_NUMBER = 'Номер у списку'
@@ -35,7 +35,7 @@ TITLE_INFO = 'Основні відомості'
 TITLE_PHOTO = 'Фотографія'
 
 
-def get_links_to_party_lists():
+def get_links_to_party_lists(START_URL):
     request = requests.get(START_URL)
     soup = BeautifulSoup(request.content, 'html.parser')
     links = soup.select(SELECT_PARTY_LISTS)
@@ -76,7 +76,7 @@ def get_party_candidate_info(party_candidate_url):
         a link to candidate's photo and a link to party_candidate's program
 
     """
-    
+
     request = requests.get(party_candidate_url)
     soup = BeautifulSoup(request.content, 'html.parser')
     party_candidate_info_dict = OrderedDict()
