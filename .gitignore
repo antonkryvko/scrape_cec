@@ -6,6 +6,5 @@
 2007*
 2006*
 2004*
-*.e4p
-.eric6project/
+.idea
 __pycache__

@@ -37,12 +37,11 @@ TITLE_PROGRAM = 'Передвиборна програма'
 TITLE_TRUSTEES = 'Довірені особи'
 
 
-def get_links_to_districts(START_URL):
+def get_links_to_districts():
     request = requests.get(START_URL)
     soup = BeautifulSoup(request.content, 'html.parser')
     links = soup.select(SELECT_DISTRICTS)
-    districts = [CURRENT_ELECTION_URL + links[idx]['href']
-                 for idx, link in (enumerate(links))]
+    districts = [CURRENT_ELECTION_URL + links[idx]['href'] for idx, link in (enumerate(links))]
     print('Посилання на сторінки округів завантажені')
     return districts
 
@@ -51,11 +50,8 @@ def get_links_to_candidates_on_districts(district_counter, district):
     request = requests.get(district)
     soup = BeautifulSoup(request.content, 'html.parser')
     links = soup.select(SELECT_CANDIDATES_ON_DISTRICTS)
-    candidates_on_districts = [CURRENT_ELECTION_URL + links[idx]['href']
-                               for idx, link in (enumerate(links))]
-    print(
-        'Завантажені посилання на профілі кандидатів на окрузі №{}'.format(
-            district_counter))
+    candidates_on_districts = [CURRENT_ELECTION_URL + links[idx]['href'] for idx, link in (enumerate(links))]
+    print('Завантажені посилання на профілі кандидатів на окрузі №{}'.format(district_counter))
     return candidates_on_districts
 
 
@@ -83,64 +79,49 @@ def get_candidate_info(candidate_url):
     request = requests.get(candidate_url)
     soup = BeautifulSoup(request.content, 'html.parser')
     candidate_info_dict = OrderedDict()
-    candidate_info_dict[TITLE_FULLNAME] = \
-        soup.select(SELECT_CANDIDATE_FULLNAME)[0].get_text()
-    candidate_info_dict[TITLE_DISTRICT] = \
-        soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[0].get_text()
-    candidate_info_dict[TITLE_NOMINATION] = \
-        soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[1].get_text()
-    candidate_info_dict[TITLE_REGISTRATON] = \
-        soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[3].get_text()
+    candidate_info_dict[TITLE_FULLNAME] = soup.select(SELECT_CANDIDATE_FULLNAME)[0].get_text()
+    candidate_info_dict[TITLE_DISTRICT] = soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[0].get_text()
+    candidate_info_dict[TITLE_NOMINATION] = soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[1].get_text()
+    candidate_info_dict[TITLE_REGISTRATON] = soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[3].get_text()
     if len(soup.find_all('tr')) <= NUMBER_OF_ROWS_IN_TABLE:
         candidate_info_dict[TITLE_CANCELLATION] = ''
-        candidate_info_dict[TITLE_INFO] = \
-            soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[4].get_text()
+        candidate_info_dict[TITLE_INFO] = soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[4].get_text()
     else:
-        candidate_info_dict[TITLE_CANCELLATION] = \
-            soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[4].get_text()
-        candidate_info_dict[TITLE_INFO] = \
-            soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[6].get_text()
-    candidate_info_dict[TITLE_PROGRAM] = CURRENT_ELECTION_URL + \
-        str(soup.select(SELECT_ELECTION_PROGRAM)[0].get('href'))
-    candidate_info_dict[TITLE_PHOTO] = CURRENT_ELECTION_URL + \
-        str(soup.img['src'])
+        candidate_info_dict[TITLE_CANCELLATION] = soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[4].get_text()
+        candidate_info_dict[TITLE_INFO] = soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[6].get_text()
+    candidate_info_dict[TITLE_PROGRAM] = "{0}{1}".format(CURRENT_ELECTION_URL,
+                                                         str(soup.select(SELECT_ELECTION_PROGRAM)[0].get('href')))
+    candidate_info_dict[TITLE_PHOTO] = CURRENT_ELECTION_URL + str(soup.img['src'])
     try:
-        trustees_link = CURRENT_ELECTION_URL + \
-            str(soup.select(SELECT_TRUSTEES_INFO)[0].get('href'))
+        trustees_link = "{0}{1}".format(CURRENT_ELECTION_URL, str(soup.select(SELECT_TRUSTEES_INFO)[0].get('href')))
     except IndexError:
         candidate_info_dict[TITLE_TRUSTEES] = ''
     else:
-        candidate_info_dict[TITLE_TRUSTEES] = \
-            get_candidate_trustees(trustees_link)
-    print('Завантажена інформація про {}'.format(
-        candidate_info_dict[TITLE_FULLNAME]))
+        candidate_info_dict[TITLE_TRUSTEES] = get_candidate_trustees(trustees_link)
+    print('Завантажена інформація про {}'.format(candidate_info_dict[TITLE_FULLNAME]))
     return candidate_info_dict
 
 
 def get_candidate_trustees(trustees_link):
     request = requests.get(trustees_link)
     soup = BeautifulSoup(request.content, 'html.parser')
-    trustees = ','.join(trustee.get_text() for trustee in soup.find_all(
-        'td', class_='b'))
+    trustees = ','.join(trustee.get_text() for trustee in soup.find_all('td', class_='b'))
     return trustees
 
 
 def download_candidate_photo(photo_url, candidate_info_dict):
     response = requests.get(photo_url)
-    photo_name = candidate_info_dict[TITLE_FULLNAME].replace(' ', '_') + '.' + \
-        photo_url.split('.')[-1]
+    photo_name = candidate_info_dict[TITLE_FULLNAME].replace(' ', '_') + '.' + photo_url.split('.')[-1]
     if not os.path.exists(PATH_TO_LOCATION_WITH_PHOTOS):
         os.makedirs(PATH_TO_LOCATION_WITH_PHOTOS)
     with open((PATH_TO_LOCATION_WITH_PHOTOS + photo_name), 'wb') as f:
         f.write(response.content)
-    print('Завантажена фотографія {}'.format(
-        candidate_info_dict[TITLE_FULLNAME]))
+    print('Завантажена фотографія {}'.format(candidate_info_dict[TITLE_FULLNAME]))
 
 
 def download_candidate_program(program_url, candidate_info_dict):
     response = requests.get(program_url)
-    program_name = candidate_info_dict[TITLE_FULLNAME].replace(' ', '_') + \
-        '.' + program_url.split('.')[-1]
+    program_name = candidate_info_dict[TITLE_FULLNAME].replace(' ', '_') + '.' + program_url.split('.')[-1]
     if not os.path.exists(PATH_TO_LOCATION_WITH_PROGRAMS):
         os.makedirs(PATH_TO_LOCATION_WITH_PROGRAMS)
     try:
@@ -159,27 +140,18 @@ def get_csv_with_candidates_info(candidates_info_dicts):
 
 def main():
     candidates_info_dicts = []
-    districts = get_links_to_districts(START_URL)
+    districts = get_links_to_districts()
     for district_counter, district in enumerate(districts, start=START_DISTRICT):
-        candidates_on_districts = \
-            get_links_to_candidates_on_districts(district_counter, district)
+        candidates_on_districts = get_links_to_candidates_on_districts(district_counter, district)
         for candidate in candidates_on_districts:
             candidate_info_dict = get_candidate_info(candidate)
-            download_candidate_photo(candidate_info_dict[TITLE_PHOTO],
-                                     candidate_info_dict)
-            download_candidate_program(
-                candidate_info_dict[TITLE_PROGRAM],
-                candidate_info_dict)
-            candidates_info_dicts.append(pd.DataFrame(candidate_info_dict,
-                                         index=[0]))
+            download_candidate_photo(candidate_info_dict[TITLE_PHOTO], candidate_info_dict)
+            download_candidate_program(candidate_info_dict[TITLE_PROGRAM], candidate_info_dict)
+            candidates_info_dicts.append(pd.DataFrame(candidate_info_dict, index=[0]))
     get_csv_with_candidates_info(candidates_info_dicts)
 
 
 if __name__ == '__main__':
     print('Починаю завантаження')
-    try:
-        main()
-    except:
-        print('Помилка')
-    else:
-        print('Завантаження успішне')
+    main()
+    print('Завантаження успішне')
