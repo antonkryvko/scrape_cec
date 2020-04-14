@@ -8,6 +8,7 @@ from CEC website on any elections you want
 import os
 from bs4 import BeautifulSoup
 from collections import OrderedDict
+from time import time
 import requests
 import pandas as pd
 
@@ -23,12 +24,12 @@ SELECT_ELECTION_PROGRAM = 'table tr > td:nth-of-type(2) > a.a1small'
 SELECT_TRUSTEES_INFO = 'table tr > td:nth-of-type(2) > a.a2'
 NUMBER_OF_ROWS_IN_TABLE = 13
 START_DISTRICT = 11
-OUTPUT_FILENAME = '2014_constituencies_candidates.csv'
+OUTPUT_FILENAME = '2014/constituencies/2014_constituencies_candidates.csv'
 
 TITLE_FULLNAME = 'ПІБ'
 TITLE_DISTRICT = 'Округ'
 TITLE_NOMINATION = 'Висування'
-TITLE_REGISTRATON = 'Номер і дата реєстрації'
+TITLE_REGISTRATION = 'Номер і дата реєстрації'
 TITLE_CANCELLATION = 'Номер та дата рішення про скасування реєстрації кандидата'
 TITLE_INFO = 'Основні відомості'
 TITLE_PHOTO = 'Фотографія'
@@ -37,20 +38,25 @@ TITLE_TRUSTEES = 'Довірені особи'
 
 
 def get_links_to_districts():
-    request = requests.get(START_URL)
-    soup = BeautifulSoup(request.content, 'html.parser')
+    start_time = time()
+    response = requests.get(START_URL)
+    soup = BeautifulSoup(response.content, 'html.parser')
     links = soup.select(SELECT_DISTRICTS)
     districts = [CURRENT_ELECTION_URL + links[idx]['href'] for idx, link in (enumerate(links))]
-    print('Посилання на сторінки округів завантажені')
+    end_time = time()
+    print('Посилання на сторінки округів завантажені за {:.2f}'.format(end_time - start_time))
     return districts
 
 
 def get_links_to_candidates_on_districts(district_counter, district):
-    request = requests.get(district)
-    soup = BeautifulSoup(request.content, 'html.parser')
+    start_time = time()
+    response = requests.get(district)
+    soup = BeautifulSoup(response.content, 'html.parser')
     links = soup.select(SELECT_CANDIDATES_ON_DISTRICTS)
     candidates_on_districts = [CURRENT_ELECTION_URL + links[idx]['href'] for idx, link in (enumerate(links))]
-    print('Завантажені посилання на профілі кандидатів на окрузі №{}'.format(district_counter))
+    end_time = time()
+    print('Завантажені посилання на профілі кандидатів на окрузі №{0} за {1:.2f} секунд'.format(district_counter,
+                                                                                                end_time - start_time))
     return candidates_on_districts
 
 
@@ -74,15 +80,15 @@ def get_candidate_info(candidate_url):
         a link to candidate's photo and a link to candidate's program
 
     """
-
-    request = requests.get(candidate_url)
-    soup = BeautifulSoup(request.content, 'html.parser')
+    start_time = time()
+    response = requests.get(candidate_url)
+    soup = BeautifulSoup(response.content, 'html.parser')
     candidate_info_dict = OrderedDict()
     candidate_info_dict[TITLE_FULLNAME] = soup.select(SELECT_CANDIDATE_FULLNAME)[0].get_text()
     candidate_info_dict[TITLE_DISTRICT] = soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[0].get_text()
     print(candidate_info_dict[TITLE_DISTRICT])
     candidate_info_dict[TITLE_NOMINATION] = soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[1].get_text()
-    candidate_info_dict[TITLE_REGISTRATON] = soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[3].get_text()
+    candidate_info_dict[TITLE_REGISTRATION] = soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[3].get_text()
     if len(soup.find_all('tr')) <= NUMBER_OF_ROWS_IN_TABLE:
         candidate_info_dict[TITLE_CANCELLATION] = ''
         candidate_info_dict[TITLE_INFO] = soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[4].get_text()
@@ -98,13 +104,15 @@ def get_candidate_info(candidate_url):
         candidate_info_dict[TITLE_TRUSTEES] = ''
     else:
         candidate_info_dict[TITLE_TRUSTEES] = get_candidate_trustees(trustees_link)
-    print('Завантажена інформація про {}'.format(candidate_info_dict[TITLE_FULLNAME]))
+    end_time = time()
+    print('Завантажена інформація про {0} за {1:.2f} секунд'.format(candidate_info_dict[TITLE_FULLNAME],
+                                                                    end_time - start_time))
     return candidate_info_dict
 
 
 def get_candidate_trustees(trustees_link):
-    request = requests.get(trustees_link)
-    soup = BeautifulSoup(request.content, 'html.parser')
+    response = requests.get(trustees_link)
+    soup = BeautifulSoup(response.content, 'html.parser')
     trustees = ','.join(trustee.get_text() for trustee in soup.find_all('td', class_='b'))
     return trustees
 
@@ -152,6 +160,8 @@ def main():
 
 
 if __name__ == '__main__':
-    print('Починаю завантаження')
+    start_time = time()
+    print('Починаю завантаження списків кандидатів')
     main()
-    print('Завантаження успішне')
+    end_time = time()
+    print('Завантаження успішно завершено за {:.2f} секунди.'.format(end_time - start_time))

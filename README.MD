@@ -17,5 +17,5 @@ git clone https://github.com/antonkryvko/scrape_cec
 cd scrape_cec
 python3 -m venv scrape_cec_venv
 source scrape_cec_venv/bin/activate
-pip3 install -r requirements.txt`
+pip3 install -r requirements.txt
 ```

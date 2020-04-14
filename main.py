@@ -24,7 +24,7 @@ parser.add_argument(
     '-e', '--elections',
     type=str,
     nargs='+',
-    choices=['presedential', 'parliamentary', 'local'],
+    choices=['presidential', 'parliamentary', 'local'],
     required=True,
     help='select the election type you want to scrape')
 args = parser.parse_args()

@@ -8,6 +8,7 @@ from CEC website on any elections you want
 import os
 from bs4 import BeautifulSoup
 from collections import OrderedDict
+from time import time
 import requests
 import pandas as pd
 
@@ -29,27 +30,32 @@ OUTPUT_FILENAME = '2019/parties/2019_party_candidates.csv'
 TITLE_PARTY = 'Партія'
 TITLE_NUMBER = 'Номер у списку'
 TITLE_FULLNAME = 'ПІБ'
-TITLE_REGISTRATON = 'Номер і дата реєстрації'
+TITLE_REGISTRATION = 'Номер і дата реєстрації'
 TITLE_CANCELLATION = 'Номер та дата рішення про скасування реєстрації кандидата'
 TITLE_INFO = 'Основні відомості'
 TITLE_PHOTO = 'Фотографія'
 
 
 def get_links_to_party_lists():
-    request = requests.get(START_URL)
-    soup = BeautifulSoup(request.content, 'html.parser')
+    start = time()
+    response = requests.get(START_URL)
+    soup = BeautifulSoup(response.content, 'html.parser')
     links = soup.select(SELECT_PARTY_LISTS)
     party_lists = [CURRENT_ELECTION_URL + links[idx]['href'] for idx, link in (enumerate(links))]
-    print('Посилання на сторінки із списками партій завантажені')
+    end = time()
+    print('Посилання на сторінки із списками партій завантажені за {:.2f}'.format(end - start))
     return party_lists
 
 
 def get_links_to_party_candidates(party_counter, party_list):
-    request = requests.get(party_list)
-    soup = BeautifulSoup(request.content, 'html.parser')
+    start_time = time()
+    response = requests.get(party_list)
+    soup = BeautifulSoup(response.content, 'html.parser')
     links = soup.select(SELECT_PARTY_CANDIDATES)
     party_candidates = [CURRENT_ELECTION_URL + links[idx]['href'] for idx, link in (enumerate(links))]
-    print('Завантажені посилання на профілі кандидатів для партії №{}'.format(party_counter))
+    end_time = time()
+    print('Завантажені посилання на профілі кандидатів для партії №{0} за {1:.2f} секунд'.format(party_counter,
+                                                                                                 end_time - start_time))
     return party_candidates
 
 
@@ -72,14 +78,14 @@ def get_party_candidate_info(party_candidate_url):
         a link to candidate's photo and a link to party_candidate's program
 
     """
-
-    request = requests.get(party_candidate_url)
-    soup = BeautifulSoup(request.content, 'html.parser')
+    start_time = time()
+    response = requests.get(party_candidate_url)
+    soup = BeautifulSoup(response.content, 'html.parser')
     party_candidate_info_dict = OrderedDict()
     party_candidate_info_dict[TITLE_PARTY] = soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[0].get_text()
     party_candidate_info_dict[TITLE_NUMBER] = soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[1].get_text()
     party_candidate_info_dict[TITLE_FULLNAME] = soup.select(SELECT_CANDIDATE_FULLNAME)[0].get_text()
-    party_candidate_info_dict[TITLE_REGISTRATON] = soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[2].get_text()
+    party_candidate_info_dict[TITLE_REGISTRATION] = soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[2].get_text()
     party_candidate_info_dict[TITLE_INFO] = soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[4].get_text()
     if len(soup.find_all('tr')) <= NUMBER_OF_ROWS_IN_TABLE:
         party_candidate_info_dict[TITLE_CANCELLATION] = ''
@@ -88,7 +94,9 @@ def get_party_candidate_info(party_candidate_url):
         party_candidate_info_dict[TITLE_CANCELLATION] = soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[3].get_text()
         party_candidate_info_dict[TITLE_INFO] = soup.select(SELECT_CANDIDATE_INFO_FROM_TABLE)[5].get_text()
     party_candidate_info_dict[TITLE_PHOTO] = "{0}{1}".format(CURRENT_ELECTION_URL, str(soup.img['src']))
-    print('Завантажена інформація про {}'.format(party_candidate_info_dict[TITLE_FULLNAME]))
+    end_time = time()
+    print('Завантажена інформація про {0} за {1:.2f} секунд'.format(party_candidate_info_dict[TITLE_FULLNAME],
+                                                                    end_time - start_time))
     return party_candidate_info_dict
 
 
@@ -103,8 +111,8 @@ def download_party_candidate_photo(photo_url, party_candidate_info_dict):
 
 
 def get_party_programs():
-    request = requests.get(START_URL)
-    soup = BeautifulSoup(request.content, 'html.parser')
+    response = requests.get(START_URL)
+    soup = BeautifulSoup(response.content, 'html.parser')
     links = soup.select(SELECT_PARTY_PROGRAMS)
     party_programs = [CURRENT_ELECTION_URL + links[idx]['href'] for idx, link in (enumerate(links))]
     print('Посилання на програму партії')
@@ -143,6 +151,8 @@ def main():
 
 
 if __name__ == '__main__':
-    print('Починаю завантаження')
+    start_time = time()
+    print('Починаю завантаження списків кандидатів')
     main()
-    print('Завантаження успішне')
+    end_time = time()
+    print('Завантаження успішно завершено за {:.2f} секунди.'.format(end_time - start_time))

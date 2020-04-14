@@ -33,13 +33,41 @@
                     "OUTPUT_FILENAME": "'2019/parties/2019_party_candidates.csv'"
                 }
             },
-            "presedential": {
+            "presidential": {
             }
         }
     },
     "2015": {
         "elections": {
             "local": {
+                "START_CANDIDATES_URL": "'https://www.cvk.gov.ua/pls/vm2015/pvm008pt001f01=100pt00_t001f01=100.html'",
+                "CURRENT_ELECTION_URL": "'https://www.cvk.gov.ua/pls/vm2015/'",
+                "PATH_TO_LOCATION": "'2015/local'",
+                "OUTPUT_FILENAME": "'2015/local/candidates.csv'",
+                "SELECT_ALL_URLS": "'td > a'",
+                "SELECT_COUNCILS": "'td.td2 > b > a'",
+                "SELECT_CANDIDATE_NAME": "'table:nth-of-type(5) tr td.td2:nth-of-type(2), table:nth-of-type(5) tr td.td3:nth-of-type(2)'",
+                "SELECT_CANDIDATE_PARTY": "'td.td2 > a.a1, td.td3 > a.a1'",
+                "CALC_CANDIDATE_PARTY": "'table.t2:nth-of-type(4) td.td2:nth-of-type(2), table.t2:nth-of-type(4) td.td3:nth-of-type(2)'",
+                "SELECT_CANDIDATE_DISTRICT": "'table:nth-of-type(5) tr td.td2:first-child, table:nth-of-type(5) tr td.td3:first-child'",
+                "SELECT_CANDIDATE_INFO": "'table:nth-of-type(5) tr td.td2small, table:nth-of-type(5) tr td.td3small'",
+                "SELECT_CANDIDATE_REGISTRATION_DATE": "'table:nth-of-type(5) tr td.td2:nth-of-type(4), table:nth-of-type(5) tr td.td3:nth-of-type(4)'",
+                "SELECT_CANDIDATE_VOTE_SELECTOR": "'table:nth-of-type(5) tr td.td2:nth-of-type(5), table:nth-of-type(5) tr td.td3:nth-of-type(5)'"
+            },
+            "mayor": {
+                "START_MAYORS_URL": "'https://www.cvk.gov.ua/pls/vm2015/pvm117pt001f01=100.html'",
+                "CURRENT_ELECTION_URL": "'https://www.cvk.gov.ua/pls/vm2015/'",
+                "PATH_TO_LOCATION": "'2015/local'",
+                "OUTPUT_FILENAME": "'2015/local/mayors.csv'",
+                "SELECT_REGION_URLS": "'td > a'",
+                "SELECT_COUNCILS": "'td.td3small > a.a1small'",
+                "SELECT_CANDIDATE_NAME": "'table:nth-of-type(4) td.td2, table:nth-of-type(4) td.td3'",
+                "SELECT_CANDIDATE_BIRTHDAY": "'td.td2small:nth-child(2), td.td3small:nth-child(2)'",
+                "SELECT_CANDIDATE_PARTY": "'td.td2small:nth-child(3), td.td3small:nth-child(3)'",
+                "SELECT_CANDIDATE_INFO": "'td.td2small:nth-child(4), td.td3small:nth-child(4)'",
+                "SELECT_CANDIDATE_REGISTRATION_DATE": "'td.td2small:nth-child(5), td.td3small:nth-child(5)'",
+                "SELECT_CANDIDATE_COUNCIL": "'p.p2'",
+                "SELECT_CANDIDATE_REGION": "'p.p1:has(img)'"
             }
         }
     },
@@ -62,9 +90,9 @@
                     "OUTPUT_FILENAME": "'2014/constituencies/2014_constituencies_candidates.csv'"
                 },
                 "party_lists": {
-                },
-            }
-            "presedential": {
+                }
+            },
+            "presidential": {
             }
         }
     },
@@ -85,20 +113,20 @@
                     "NUMBER_OF_ROWS_IN_TABLE": "13",
                     "START_DISTRICT": "1",
                     "OUTPUT_FILENAME": "'2012/constituencies/2012_constituencies_candidates.csv'"
-                }
-                "party_lists": {
                 },
-            }
-            "presedential": {
+                "party_lists": {
+                }
+            },
+            "presidential": {
             }
         }
     },
     "2010": {
         "elections": {
-            "presedential": {
+            "presidential": {
                 },
             "local": {
-            },
+            }
         }
     },
     "2007": {
@@ -119,7 +147,7 @@
     },
     "2004": {
         "elections": {
-            "presedential": {
+            "presidential": {
             }
         }
     }
