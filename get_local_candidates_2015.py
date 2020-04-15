@@ -1,7 +1,9 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """CEC scrape module.
 
 It's a try to make a module for scraping candidates' information
-from CEC website on local elections-2015
+from CEC website on local elections-2015.
 
 """
 
@@ -11,7 +13,6 @@ from collections import OrderedDict
 from time import time
 import requests
 import pandas as pd
-
 
 START_CANDIDATES_URL = 'https://www.cvk.gov.ua/pls/vm2015/pvm008pt001f01=100pt00_t001f01=100.html'
 CURRENT_ELECTION_URL = 'https://www.cvk.gov.ua/pls/vm2015/'
@@ -65,32 +66,39 @@ def get_urls_to_councils(urls_list):
 
 def get_candidates_info(urls_list):
     """
-    Function gets a list with local councils' urls and returns a list with all info about candidates
+    Function gets a list with local councils' urls and returns a list with all info about candidates.
+    For preventing data loss, function writes intermediate results to appropriate files.
     :param urls_list: a list of strings
     :return candidates_info: a pandasDataframe (multivector list)
     """
     candidates_info = list()
     for url in urls_list:
-        start_time = time()
-        candidates_info_dict = OrderedDict()
-        response = requests.get(url, verify=False)
-        soup = BeautifulSoup(response.content, 'lxml')
-        candidates_info_dict[CANDIDATE_NAME] = [soup.select(SELECT_CANDIDATE_NAME)[idx].get_text()
-                                                for idx, _ in enumerate(soup.select(SELECT_CANDIDATE_NAME))]
-        candidates_info_dict[CANDIDATE_PARTY] = get_filled_party_column(soup)
-        candidates_info_dict[CANDIDATE_DISTRICT] = [soup.select(SELECT_CANDIDATE_DISTRICT)[idx].get_text() for idx, _
-                                                    in enumerate(soup.select(SELECT_CANDIDATE_DISTRICT))]
-        candidates_info_dict[CANDIDATE_REGION] = soup.find('p', {'class': 'p2'}).contents[0]
-        candidates_info_dict[CANDIDATE_COUNCIL] = soup.find('p', {'class': 'p2'}).contents[2]
-        candidates_info_dict[CANDIDATE_INFO] = [soup.select(SELECT_CANDIDATE_INFO)[idx].get_text() for idx, _ in
-                                                enumerate(soup.select(SELECT_CANDIDATE_INFO))]
-        candidates_info_dict[CANDIDATE_REGISTRATION_DATE] = [
-            soup.select(SELECT_CANDIDATE_REGISTRATION_DATE)[idx].get_text() for idx, _ in
-            enumerate(soup.select(SELECT_CANDIDATE_REGISTRATION_DATE))]
-        candidates_info_dict[CANDIDATE_VOTE] = [soup.select(SELECT_CANDIDATE_VOTE_SELECTOR)[idx].get_text() for idx, _
-                                                in enumerate(soup.select(SELECT_CANDIDATE_VOTE_SELECTOR))]
-        candidates_info.append(pd.DataFrame(candidates_info_dict))
-        end_time = time()
+        try:
+            start_time = time()
+            candidates_info_dict = OrderedDict()
+            response = requests.get(url, verify=False)
+            soup = BeautifulSoup(response.content, 'lxml')
+            candidates_info_dict[CANDIDATE_NAME] = [soup.select(SELECT_CANDIDATE_NAME)[idx].get_text()
+                                                    for idx, _ in enumerate(soup.select(SELECT_CANDIDATE_NAME))]
+            candidates_info_dict[CANDIDATE_PARTY] = get_filled_party_column(soup)
+            candidates_info_dict[CANDIDATE_DISTRICT] = [soup.select(SELECT_CANDIDATE_DISTRICT)[idx].get_text() for
+                                                        idx, _
+                                                        in enumerate(soup.select(SELECT_CANDIDATE_DISTRICT))]
+            candidates_info_dict[CANDIDATE_REGION] = soup.find('p', {'class': 'p2'}).contents[0]
+            candidates_info_dict[CANDIDATE_COUNCIL] = soup.find('p', {'class': 'p2'}).contents[2]
+            candidates_info_dict[CANDIDATE_INFO] = [soup.select(SELECT_CANDIDATE_INFO)[idx].get_text() for idx, _ in
+                                                    enumerate(soup.select(SELECT_CANDIDATE_INFO))]
+            candidates_info_dict[CANDIDATE_REGISTRATION_DATE] = [
+                soup.select(SELECT_CANDIDATE_REGISTRATION_DATE)[idx].get_text() for idx, _ in
+                enumerate(soup.select(SELECT_CANDIDATE_REGISTRATION_DATE))]
+            candidates_info_dict[CANDIDATE_VOTE] = [soup.select(SELECT_CANDIDATE_VOTE_SELECTOR)[idx].get_text()
+                                                    for idx, _ in
+                                                    enumerate(soup.select(SELECT_CANDIDATE_VOTE_SELECTOR))]
+            record_intermediate_result(candidates_info_dict)
+            candidates_info.append(pd.DataFrame(candidates_info_dict))
+            end_time = time()
+        except AttributeError:
+            continue
         print('{0} downloaded in {1:.2f} seconds'.format((candidates_info_dict[CANDIDATE_COUNCIL]),
                                                          end_time - start_time))
     return candidates_info
@@ -111,6 +119,13 @@ def get_filled_party_column(soup):
     for idx, _ in enumerate(party_list):
         filled_party_column.extend(list((party_list[idx] * int(candidates_number[idx]))))
     return filled_party_column
+
+
+def record_intermediate_result(candidates_info_dict):
+    path_to_directory = PATH_TO_LOCATION + '/{}/'.format(candidates_info_dict[CANDIDATE_REGION])
+    if not os.path.exists(path_to_directory):
+        os.makedirs(path_to_directory)
+    pd.DataFrame(candidates_info_dict).to_csv(path_to_directory + candidates_info_dict[CANDIDATE_COUNCIL] + '.csv')
 
 
 def get_csv_with_candidates_info(candidates_info_list):
@@ -137,4 +152,4 @@ if __name__ == '__main__':
     print('Починаю завантаження списків кандидатів')
     main()
     end_time = time()
-    print('Завантаження успішно завершено {:.2f}.'.format(end_time - start_time))
+    print('Завантаження успішно завершено за {:.2f} секунди.'.format(end_time - start_time))

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """CEC scrape module.
 
 It's a try to make a module for scraping mayors' information
