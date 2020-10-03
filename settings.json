@@ -1,4 +1,56 @@
 {
+    "2020": {
+        "elections": {
+            "local": {
+                "START_CANDIDATES_URL": "https://www.cvk.gov.ua/pls/vm2020/pvm008pt001f01=695pt00_t001f01=695.html",
+                "CURRENT_ELECTION_URL": "https://www.cvk.gov.ua/pls/vm2020/",
+                "PATH_TO_LOCATION": "2020/local",
+                "OUTPUT_FILENAME": "2020/local/candidates.csv",
+                "SELECT_ALL_URLS": "td > a",
+                "SELECT_COUNCILS": "td.td2 > b > a",
+                "SELECT_CANDIDATE_NAME": "table:nth-of-type(5) tr td.td2:nth-of-type(2), table:nth-of-type(5) tr td.td3:nth-of-type(2)",
+                "SELECT_CANDIDATE_PARTY": "td.td2 > a.a1, td.td3 > a.a1",
+                "CALC_CANDIDATE_PARTY": "table.t2:nth-of-type(4) td.td2:nth-of-type(3), table.t2:nth-of-type(4) td.td3:nth-of-type(3)",
+                "SELECT_CANDIDATE_UNITED_NUMBER": "table:nth-of-type(5) tr td.td2:first-child, table:nth-of-type(5) tr td.td3:first-child",
+                "SELECT_CANDIDATE_REGIONAL_NUMBER": "table:nth-of-type(5) tr td.td2:nth-of-type(6), table:nth-of-type(5) tr td.td3:nth-of-type(6)",
+                "SELECT_CANDIDATE_BIRTHDAY": "table:nth-of-type(5) tr td.td2small:nth-of-type(3), table:nth-of-type(5) tr td.td3small:nth-of-type(3)",
+                "SELECT_CANDIDATE_INFO": "table:nth-of-type(5) tr td.td2small:nth-of-type(4), table:nth-of-type(5) tr td.td3small:nth-of-type(4)",
+                "SELECT_CANDIDATE_DISTRICT": "table:nth-of-type(5) tr td.td2:nth-of-type(5), table:nth-of-type(5) tr td.td3:nth-of-type(5)",
+                "SELECT_CANDIDATE_REGISTRATION_DATE": "table:nth-of-type(5) tr td.td2:nth-of-type(7), table:nth-of-type(5) tr td.td3:nth-of-type(7)",
+                "SELECT_CANDIDATE_VOTE_SELECTOR": "table:nth-of-type(5) tr td.td2:nth-of-type(8), table:nth-of-type(5) tr td.td3:nth-of-type(8)"
+            },
+            "mayor": {
+                "START_MAYORS_URL": "https://www.cvk.gov.ua/pls/vm2020/pvm117pt001f01=695.html",
+                "CURRENT_ELECTION_URL": "https://www.cvk.gov.ua/pls/vm2020/",
+                "PATH_TO_LOCATION": "2020/local",
+                "OUTPUT_FILENAME": "2020/local/mayors.csv",
+                "SELECT_REGION_URLS": "td > a",
+                "SELECT_COUNCILS": "td.td3small > a.a1small",
+                "SELECT_CANDIDATE_NAME": "table:nth-of-type(4) td.td2, table:nth-of-type(4) td.td3",
+                "SELECT_CANDIDATE_BIRTHDAY": "td.td2small:nth-child(2), td.td3small:nth-child(2)",
+                "SELECT_CANDIDATE_PARTY": "td.td2small:nth-child(3), td.td3small:nth-child(3)",
+                "SELECT_CANDIDATE_INFO": "td.td2small:nth-child(4), td.td3small:nth-child(4)",
+                "SELECT_CANDIDATE_REGISTRATION_DATE": "td.td2small:nth-child(5), td.td3small:nth-child(5)",
+                "SELECT_CANDIDATE_COUNCIL": "p.p2",
+                "SELECT_CANDIDATE_REGION": "div#result p.p1"
+            },
+            "communities": {
+                "START_COMMUNITIES_URL": "https://www.cvk.gov.ua/pls/vm2020/pvm158pt001f01=695.html",
+                "CURRENT_ELECTION_URL": "https://www.cvk.gov.ua/pls/vm2020/",
+                "PATH_TO_LOCATION": "2020/local",
+                "OUTPUT_FILENAME": "2020/local/communities.csv",
+                "SELECT_REGION_URLS": "td > a",
+                "SELECT_COUNCILS": "td.td3small > a.a1small",
+                "SELECT_CANDIDATE_DISTRICT": "table:nth-of-type(3) td.td2:nth-of-type(1), table:nth-of-type(3) td.td3:nth-of-type(1)",
+                "SELECT_CANDIDATE_NAME": "table:nth-of-type(3) td.td2:nth-of-type(2), table:nth-of-type(3) td.td3:nth-of-type(2)",
+                "SELECT_CANDIDATE_BIRTHDAY": "table:nth-of-type(3) td.td2:nth-of-type(3), table:nth-of-type(3) td.td3:nth-of-type(3)",
+                "SELECT_CANDIDATE_PARTY": "table:nth-of-type(3) td.td2:nth-of-type(4), table:nth-of-type(3) td.td3:nth-of-type(4)",
+                "SELECT_CANDIDATE_INFO": "table:nth-of-type(3) td.td2:nth-of-type(5), table:nth-of-type(3) td.td3:nth-of-type(5)",
+                "SELECT_CANDIDATE_REGISTRATION_DATE": "table:nth-of-type(3) td.td2:nth-of-type(6), table:nth-of-type(3) td.td3:nth-of-type(6)",
+                "SELECT_CANDIDATE_COUNCIL": "p.p2"
+            }
+        }
+    },
     "2019": {
         "elections": {
             "parliamentary": {

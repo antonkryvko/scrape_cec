@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""CEC scrape module.
+"""
+CEC scrape module.
 
 It's a try to make a module for scraping candidates' information
-from CEC website on local elections-2015.
+from CEC website on local elections-2020.
 
 """
 
@@ -14,17 +15,20 @@ from time import time
 import requests
 import pandas as pd
 
-START_CANDIDATES_URL = 'https://www.cvk.gov.ua/pls/vm2015/pvm008pt001f01=100pt00_t001f01=100.html'
-CURRENT_ELECTION_URL = 'https://www.cvk.gov.ua/pls/vm2015/'
-PATH_TO_LOCATION = '2015/local'
-OUTPUT_FILENAME = '2015/local/candidates.csv'
+START_CANDIDATES_URL = 'https://www.cvk.gov.ua/pls/vm2020/pvm008pt001f01=695pt00_t001f01=695.html'
+CURRENT_ELECTION_URL = 'https://www.cvk.gov.ua/pls/vm2020/'
+PATH_TO_LOCATION = '2020/local'
+OUTPUT_FILENAME = '2020/local/candidates.csv'
 
 CANDIDATE_NAME = 'ПІБ'
 CANDIDATE_PARTY = 'Партія'
-CANDIDATE_DISTRICT = 'Округ'
+CANDIDATE_UNITED_NUMBER = '№ у єдиному списку'
+CANDIDATE_DISTRICT = '№ ТВО за яким закріплено'
 CANDIDATE_REGION = 'Область'
 CANDIDATE_COUNCIL = 'Рада'
+CANDIDATE_BIRTHDAY = 'Дата та місце народження'
 CANDIDATE_INFO = 'Відомості'
+CANDIDATE_REGIONAL_NUMBER = '№ у територіальному списку'
 CANDIDATE_REGISTRATION_DATE = 'Дата реєстрації'
 CANDIDATE_VOTE = '% голосів за'
 
@@ -32,14 +36,21 @@ SELECT_ALL_URLS = 'td > a'
 SELECT_COUNCILS = 'td.td2 > b > a'
 SELECT_CANDIDATE_NAME = 'table:nth-of-type(5) tr td.td2:nth-of-type(2), table:nth-of-type(5) tr td.td3:nth-of-type(2)'
 SELECT_CANDIDATE_PARTY = 'td.td2 > a.a1, td.td3 > a.a1'
-CALC_CANDIDATE_PARTY = 'table.t2:nth-of-type(4) td.td2small:nth-of-type(2),table.t2:nth-of-type(4) ' \
-                       'td.td3small:nth-of-type(2) '
-SELECT_CANDIDATE_DISTRICT = 'table:nth-of-type(5) tr td.td2:first-child, table:nth-of-type(5) tr td.td3:first-child'
-SELECT_CANDIDATE_INFO = 'table:nth-of-type(5) tr td.td2small, table:nth-of-type(5) tr td.td3small'
-SELECT_CANDIDATE_REGISTRATION_DATE = 'table:nth-of-type(5) tr td.td2:nth-of-type(4),\
-                                        table:nth-of-type(5) tr td.td3:nth-of-type(4)'
-SELECT_CANDIDATE_VOTE_SELECTOR = 'table:nth-of-type(5) tr td.td2:nth-of-type(5),\
-                                    table:nth-of-type(5) tr td.td3:nth-of-type(5)'
+CALC_CANDIDATE_PARTY = 'table.t2:nth-of-type(4) td.td2:nth-of-type(3), table.t2:nth-of-type(4) td.td3:nth-of-type(3)'
+SELECT_CANDIDATE_UNITED_NUMBER = 'table:nth-of-type(5) tr td.td2:first-child, table:nth-of-type(5) tr ' \
+                                 'td.td3:first-child '
+SELECT_CANDIDATE_REGIONAL_NUMBER = 'table:nth-of-type(5) tr td.td2:nth-of-type(6), table:nth-of-type(5) tr ' \
+                                   'td.td3:nth-of-type(6) '
+SELECT_CANDIDATE_BIRTHDAY = 'table:nth-of-type(5) tr td.td2small:nth-of-type(3), table:nth-of-type(5) tr ' \
+                            'td.td3small:nth-of-type(3) '
+SELECT_CANDIDATE_INFO = 'table:nth-of-type(5) tr td.td2small:nth-of-type(4), table:nth-of-type(5) tr ' \
+                        'td.td3small:nth-of-type(4) '
+SELECT_CANDIDATE_DISTRICT = 'table:nth-of-type(5) tr td.td2:nth-of-type(5), table:nth-of-type(5) tr ' \
+                            'td.td3:nth-of-type(5) '
+SELECT_CANDIDATE_REGISTRATION_DATE = 'table:nth-of-type(5) tr td.td2:nth-of-type(7),\
+                                        table:nth-of-type(5) tr td.td3:nth-of-type(7)'
+SELECT_CANDIDATE_VOTE_SELECTOR = 'table:nth-of-type(5) tr td.td2:nth-of-type(8),\
+                                    table:nth-of-type(5) tr td.td3:nth-of-type(8)'
 
 
 def get_all_urls():
@@ -82,13 +93,20 @@ def get_candidates_info(urls_list):
             candidates_info_dict[CANDIDATE_NAME] = [soup.select(SELECT_CANDIDATE_NAME)[idx].get_text()
                                                     for idx, _ in enumerate(soup.select(SELECT_CANDIDATE_NAME))]
             candidates_info_dict[CANDIDATE_PARTY] = get_filled_party_column(soup)
-            candidates_info_dict[CANDIDATE_DISTRICT] = [soup.select(SELECT_CANDIDATE_DISTRICT)[idx].get_text() for
-                                                        idx, _
-                                                        in enumerate(soup.select(SELECT_CANDIDATE_DISTRICT))]
+            candidates_info_dict[CANDIDATE_UNITED_NUMBER] = [soup.select(SELECT_CANDIDATE_UNITED_NUMBER)[idx].get_text()
+                                                             for
+                                                             idx, _
+                                                             in enumerate(soup.select(SELECT_CANDIDATE_UNITED_NUMBER))]
             candidates_info_dict[CANDIDATE_REGION] = soup.find('p', {'class': 'p2'}).contents[0]
             candidates_info_dict[CANDIDATE_COUNCIL] = soup.find('p', {'class': 'p2'}).contents[2]
+            candidates_info_dict[CANDIDATE_BIRTHDAY] = [soup.select(SELECT_CANDIDATE_BIRTHDAY)[idx].get_text() for
+                                                        idx, _ in
+                                                        enumerate(soup.select(SELECT_CANDIDATE_BIRTHDAY))]
             candidates_info_dict[CANDIDATE_INFO] = [soup.select(SELECT_CANDIDATE_INFO)[idx].get_text() for idx, _ in
                                                     enumerate(soup.select(SELECT_CANDIDATE_INFO))]
+            candidates_info_dict[CANDIDATE_REGIONAL_NUMBER] = [
+                soup.select(SELECT_CANDIDATE_REGIONAL_NUMBER)[idx].get_text() for idx, _ in
+                enumerate(soup.select(SELECT_CANDIDATE_REGIONAL_NUMBER))]
             candidates_info_dict[CANDIDATE_REGISTRATION_DATE] = [
                 soup.select(SELECT_CANDIDATE_REGISTRATION_DATE)[idx].get_text() for idx, _ in
                 enumerate(soup.select(SELECT_CANDIDATE_REGISTRATION_DATE))]
@@ -98,6 +116,9 @@ def get_candidates_info(urls_list):
             record_intermediate_result(candidates_info_dict)
             candidates_info.append(pd.DataFrame(candidates_info_dict))
             end_time = time()
+        except IndexError:
+            print('На сторінку ради не завантажені списки кандидатів, переходжу до наступної.')
+            continue
         except AttributeError:
             continue
         print('{0} downloaded in {1:.2f} seconds'.format((candidates_info_dict[CANDIDATE_COUNCIL]),

@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""CEC scrape module.
-
-It's a try to make a module for scraping candidates' information
-from CEC website on local elections-2015.
-
-"""
 
 import os
 from bs4 import BeautifulSoup
@@ -13,11 +7,14 @@ from collections import OrderedDict
 from time import time
 import requests
 import pandas as pd
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-START_CANDIDATES_URL = 'https://www.cvk.gov.ua/pls/vm2015/pvm008pt001f01=100pt00_t001f01=100.html'
-CURRENT_ELECTION_URL = 'https://www.cvk.gov.ua/pls/vm2015/'
-PATH_TO_LOCATION = '2015/local'
-OUTPUT_FILENAME = '2015/local/candidates.csv'
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+START_CANDIDATES_URL = 'https://www.cvk.gov.ua/pls/vm2010/wm00114pt00_t001f01=800pxto=0.html'
+CURRENT_ELECTION_URL = 'https://www.cvk.gov.ua/pls/vm2010/'
+PATH_TO_LOCATION = '2010/local'
+OUTPUT_FILENAME = '2010/local/elected.csv'
 
 CANDIDATE_NAME = 'ПІБ'
 CANDIDATE_PARTY = 'Партія'
@@ -25,21 +22,23 @@ CANDIDATE_DISTRICT = 'Округ'
 CANDIDATE_REGION = 'Область'
 CANDIDATE_COUNCIL = 'Рада'
 CANDIDATE_INFO = 'Відомості'
-CANDIDATE_REGISTRATION_DATE = 'Дата реєстрації'
-CANDIDATE_VOTE = '% голосів за'
+CANDIDATE_ELECTION_DATE = 'Дата реєстрації'
 
-SELECT_ALL_URLS = 'td > a'
-SELECT_COUNCILS = 'td.td2 > b > a'
-SELECT_CANDIDATE_NAME = 'table:nth-of-type(5) tr td.td2:nth-of-type(2), table:nth-of-type(5) tr td.td3:nth-of-type(2)'
-SELECT_CANDIDATE_PARTY = 'td.td2 > a.a1, td.td3 > a.a1'
-CALC_CANDIDATE_PARTY = 'table.t2:nth-of-type(4) td.td2small:nth-of-type(2),table.t2:nth-of-type(4) ' \
+SELECT_ALL_URLS = 'table.t2 td > a'
+SELECT_COUNCILS = 'a.a1small'
+SELECT_CANDIDATE_NAME = 'table:nth-of-type(5) tr td.td2small:nth-of-type(3),table:nth-of-type(5) tr ' \
+                        'td.td3small:nth-of-type(3) '
+SELECT_ROWS_IN_CANDIDATE_TABLE = 'table.t2:nth-of-type(5) tr'
+SELECT_PARTY_FROM_CANDIDATE_TABLE = 'table.t2:nth-of-type(5) td.td10'
+SELECT_PARTY_FROM_RESULTS_TABLE = 'table.t2:nth-of-type(4) td.td2small:first-child'
+CALC_CANDIDATE_PARTY = 'table.t2:nth-of-type(4) td.td2small:nth-of-type(2), table.t2:nth-of-type(4) ' \
                        'td.td3small:nth-of-type(2) '
-SELECT_CANDIDATE_DISTRICT = 'table:nth-of-type(5) tr td.td2:first-child, table:nth-of-type(5) tr td.td3:first-child'
-SELECT_CANDIDATE_INFO = 'table:nth-of-type(5) tr td.td2small, table:nth-of-type(5) tr td.td3small'
-SELECT_CANDIDATE_REGISTRATION_DATE = 'table:nth-of-type(5) tr td.td2:nth-of-type(4),\
-                                        table:nth-of-type(5) tr td.td3:nth-of-type(4)'
-SELECT_CANDIDATE_VOTE_SELECTOR = 'table:nth-of-type(5) tr td.td2:nth-of-type(5),\
-                                    table:nth-of-type(5) tr td.td3:nth-of-type(5)'
+SELECT_CANDIDATE_DISTRICT = 'table:nth-of-type(5) tr td.td2small:nth-of-type(2),table:nth-of-type(5) tr ' \
+                            'td.td3small:nth-of-type(2) '
+SELECT_CANDIDATE_INFO = 'table:nth-of-type(5) tr td.td2small:nth-of-type(5),table:nth-of-type(5) tr ' \
+                        'td.td3small:nth-of-type(5) '
+SELECT_CANDIDATE_ELECTION_DATE = 'table:nth-of-type(5) tr td.td2small:nth-of-type(4),table:nth-of-type(5) tr ' \
+                                 'td.td3small:nth-of-type(4) '
 
 
 def get_all_urls():
@@ -81,20 +80,19 @@ def get_candidates_info(urls_list):
             soup = BeautifulSoup(response.content, 'lxml')
             candidates_info_dict[CANDIDATE_NAME] = [soup.select(SELECT_CANDIDATE_NAME)[idx].get_text()
                                                     for idx, _ in enumerate(soup.select(SELECT_CANDIDATE_NAME))]
-            candidates_info_dict[CANDIDATE_PARTY] = get_filled_party_column(soup)
+            candidates_info_dict[CANDIDATE_PARTY] = get_filled_party_column(
+                soup) if None not in get_filled_party_column(soup) else soup.select(SELECT_PARTY_FROM_RESULTS_TABLE)[
+                0].get_text()
             candidates_info_dict[CANDIDATE_DISTRICT] = [soup.select(SELECT_CANDIDATE_DISTRICT)[idx].get_text() for
                                                         idx, _
                                                         in enumerate(soup.select(SELECT_CANDIDATE_DISTRICT))]
-            candidates_info_dict[CANDIDATE_REGION] = soup.find('p', {'class': 'p2'}).contents[0]
-            candidates_info_dict[CANDIDATE_COUNCIL] = soup.find('p', {'class': 'p2'}).contents[2]
+            candidates_info_dict[CANDIDATE_REGION] = soup.find('p', {'class': 'p1'}).contents[1]
+            candidates_info_dict[CANDIDATE_COUNCIL] = soup.find('p', {'class': 'p2'}).contents[0]
             candidates_info_dict[CANDIDATE_INFO] = [soup.select(SELECT_CANDIDATE_INFO)[idx].get_text() for idx, _ in
                                                     enumerate(soup.select(SELECT_CANDIDATE_INFO))]
-            candidates_info_dict[CANDIDATE_REGISTRATION_DATE] = [
-                soup.select(SELECT_CANDIDATE_REGISTRATION_DATE)[idx].get_text() for idx, _ in
-                enumerate(soup.select(SELECT_CANDIDATE_REGISTRATION_DATE))]
-            candidates_info_dict[CANDIDATE_VOTE] = [soup.select(SELECT_CANDIDATE_VOTE_SELECTOR)[idx].get_text()
-                                                    for idx, _ in
-                                                    enumerate(soup.select(SELECT_CANDIDATE_VOTE_SELECTOR))]
+            candidates_info_dict[CANDIDATE_ELECTION_DATE] = [
+                soup.select(SELECT_CANDIDATE_ELECTION_DATE)[idx].get_text() for idx, _ in
+                enumerate(soup.select(SELECT_CANDIDATE_ELECTION_DATE))]
             record_intermediate_result(candidates_info_dict)
             candidates_info.append(pd.DataFrame(candidates_info_dict))
             end_time = time()
@@ -107,19 +105,19 @@ def get_candidates_info(urls_list):
 
 def get_filled_party_column(soup):
     """
-    A service function for filling 'Партія' column with values. Takes party name, number of party candidates and
-    multiplies these values for each party on a page
+    A service function for filling 'Партія' column with values. Looks through rows except the first one for party name
+    and adds it to a list until finds out the next party name.
     :param soup: BeautifulSoup object
     :return filled_party_column: a list of strings
     """
     filled_party_column = list()
-    party_list = [(soup.select(SELECT_CANDIDATE_PARTY)[idx].get_text(),) for idx, _ in
-                  enumerate(soup.select(SELECT_CANDIDATE_PARTY))]
-    candidates_number = [soup.select(CALC_CANDIDATE_PARTY)[idx].get_text() for idx, _ in
-                         enumerate(soup.select(CALC_CANDIDATE_PARTY))]
-    for idx, _ in enumerate(party_list):
-        filled_party_column.extend(list((party_list[idx] * int(candidates_number[idx]))))
-    return filled_party_column
+    party = None
+    for _, value in enumerate(soup.select(SELECT_ROWS_IN_CANDIDATE_TABLE)):
+        if value.select(SELECT_PARTY_FROM_CANDIDATE_TABLE):
+            party = value.select(SELECT_PARTY_FROM_CANDIDATE_TABLE)[0].get_text()
+            continue
+        filled_party_column.append(party)
+    return filled_party_column[1:]
 
 
 def record_intermediate_result(candidates_info_dict):
