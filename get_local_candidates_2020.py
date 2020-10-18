@@ -104,6 +104,9 @@ def get_candidates_info(urls_list):
                                                         enumerate(soup.select(SELECT_CANDIDATE_BIRTHDAY))]
             candidates_info_dict[CANDIDATE_INFO] = [soup.select(SELECT_CANDIDATE_INFO)[idx].get_text() for idx, _ in
                                                     enumerate(soup.select(SELECT_CANDIDATE_INFO))]
+            candidates_info_dict[CANDIDATE_DISTRICT] = [soup.select(SELECT_CANDIDATE_DISTRICT)[idx].get_text() for
+                                                        idx, _ in
+                                                        enumerate(soup.select(SELECT_CANDIDATE_DISTRICT))]
             candidates_info_dict[CANDIDATE_REGIONAL_NUMBER] = [
                 soup.select(SELECT_CANDIDATE_REGIONAL_NUMBER)[idx].get_text() for idx, _ in
                 enumerate(soup.select(SELECT_CANDIDATE_REGIONAL_NUMBER))]
