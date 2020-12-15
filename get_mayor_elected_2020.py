@@ -17,31 +17,24 @@ import pandas as pd
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-START_CANDIDATES_URL = 'https://www.cvk.gov.ua/pls/vm2020/pvm002pt001f01=695pt00_t001f01=695.html'
+START_CANDIDATES_URL = 'https://www.cvk.gov.ua/pls/vm2020/pvm003pt001f01=695pt00_t001f01=695.html'
 CURRENT_ELECTION_URL = 'https://www.cvk.gov.ua/pls/vm2020/'
 PATH_TO_LOCATION = '2020/local'
-OUTPUT_FILENAME = '2020/local/elected.csv'
+OUTPUT_FILENAME = '2020/local/mayors_elected.csv'
 
 CANDIDATE_NAME = 'ПІБ'
 CANDIDATE_PARTY = 'Партія'
-CANDIDATE_DISTRICT_LINKED = '№ ТВО за яким закріплено'
-CANDIDATE_COUNCIL = 'Область і рада'
-CANDIDATE_INFO = 'Відомості про обраного депутата'
-CANDIDATE_VOTE = '% голосів за'
-CANDIDATE_QUOTA = '% від квоти'
-CANDIDATE_DISTRICT_ELECTED = 'Виборчий округ, в якому обрано'
+CANDIDATE_REGION = 'Область'
+CANDIDATE_COUNCIL = 'Рада'
+CANDIDATE_VOTE = 'Кількість голосів за'
+CANDIDATE_PERCENT = '% голосів за'
 
-SELECT_ALL_URLS = 'td > a'
-SELECT_COUNCILS = 'td.td2 > a.a1'
-SELECT_CANDIDATE_NAME = 'table:nth-of-type(6) tr td.td2:nth-of-type(2), table:nth-of-type(6) tr td.td3:nth-of-type(2)'
-SELECT_PARTY_FROM_RESULTS_TABLE = 'td.td2 > a.a1, td.td3 > a.a1'
-SELECT_PARTY_FROM_CANDIDATE_TABLE = 'table.t2:nth-of-type(6) td.td10'
-SELECT_ROWS_IN_CANDIDATE_TABLE = 'table.t2:nth-of-type(6) tr'
-SELECT_CANDIDATE_DISTRICT_LINKED = 'table:nth-of-type(6) tr td.td2:nth-of-type(1), table:nth-of-type(6) tr td.td3:nth-of-type(1)'
-SELECT_CANDIDATE_INFO = 'table:nth-of-type(6) tr td.td2small, table:nth-of-type(6) tr td.td3small'
-SELECT_CANDIDATE_VOTE = 'table:nth-of-type(6) tr td.td2:nth-of-type(4), table:nth-of-type(6) tr td.td3:nth-of-type(4)'
-SELECT_CANDIDATE_QUOTA = 'table:nth-of-type(6) tr td.td2:nth-of-type(5), table:nth-of-type(6) tr td.td3:nth-of-type(5)'
-SELECT_CANDIDATE_DISTRICT_ELECTED = 'table:nth-of-type(6) tr td.td2:nth-of-type(6), table:nth-of-type(6) tr td.td3:nth-of-type(6)'
+SELECT_ALL_URLS = 'td a.a1small'
+SELECT_COUNCILS = 'td > a.a1'
+SELECT_CANDIDATE_NAME = 'table.t2 tr td.td2:nth-of-type(1), table.t2 tr td.td3:nth-of-type(1)'
+SELECT_CANDIDATE_PARTY = 'table.t2 tr td.td2:nth-of-type(2), table.t2 tr td.td3:nth-of-type(2)'
+SELECT_CANDIDATE_VOTE = 'table.t2 tr td.td2:nth-of-type(3), table.t2 tr td.td3:nth-of-type(3)'
+SELECT_CANDIDATE_PERCENT = 'table.t2 tr td.td2:nth-of-type(4), table.t2 tr td.td3:nth-of-type(4)'
 
 
 def get_all_urls():
@@ -83,24 +76,17 @@ def get_candidates_info(urls_list):
             soup = BeautifulSoup(response.content, 'lxml')
             candidates_info_dict[CANDIDATE_NAME] = [soup.select(SELECT_CANDIDATE_NAME)[idx].get_text()
                                                     for idx, _ in enumerate(soup.select(SELECT_CANDIDATE_NAME))]
-            candidates_info_dict[CANDIDATE_PARTY] = get_filled_party_column(soup)
+            candidates_info_dict[CANDIDATE_PARTY] = [soup.select(SELECT_CANDIDATE_PARTY)[idx].get_text()
+                                                     for idx, _ in
+                                                     enumerate(soup.select(SELECT_CANDIDATE_PARTY))]
+            candidates_info_dict[CANDIDATE_REGION] = soup.find('p', {'class': 'p1'}).findNext('p').contents[1]
             candidates_info_dict[CANDIDATE_COUNCIL] = soup.find('p', {'class': 'p2'}).contents[0]
-            candidates_info_dict[CANDIDATE_DISTRICT_LINKED] = [
-                soup.select(SELECT_CANDIDATE_DISTRICT_LINKED)[idx].get_text() for
-                idx, _ in
-                enumerate(soup.select(SELECT_CANDIDATE_DISTRICT_LINKED))]
-            candidates_info_dict[CANDIDATE_INFO] = [
-                soup.select(SELECT_CANDIDATE_INFO)[idx].get_text() for idx, _ in
-                enumerate(soup.select(SELECT_CANDIDATE_INFO))]
             candidates_info_dict[CANDIDATE_VOTE] = [
                 soup.select(SELECT_CANDIDATE_VOTE)[idx].get_text() for idx, _ in
                 enumerate(soup.select(SELECT_CANDIDATE_VOTE))]
-            candidates_info_dict[CANDIDATE_QUOTA] = [soup.select(SELECT_CANDIDATE_QUOTA)[idx].get_text()
-                                                     for idx, _ in
-                                                     enumerate(soup.select(SELECT_CANDIDATE_QUOTA))]
-            candidates_info_dict[CANDIDATE_DISTRICT_ELECTED] = [
-                soup.select(SELECT_CANDIDATE_DISTRICT_ELECTED)[idx].get_text() for idx, _ in
-                enumerate(soup.select(SELECT_CANDIDATE_DISTRICT_ELECTED))]
+            candidates_info_dict[CANDIDATE_PERCENT] = [soup.select(SELECT_CANDIDATE_PERCENT)[idx].get_text()
+                                                       for idx, _ in
+                                                       enumerate(soup.select(SELECT_CANDIDATE_PERCENT))]
             record_intermediate_result(candidates_info_dict)
             candidates_info.append(pd.DataFrame(candidates_info_dict))
             end_time = time()
@@ -109,23 +95,6 @@ def get_candidates_info(urls_list):
         print('{0} downloaded in {1:.2f} seconds'.format((candidates_info_dict[CANDIDATE_COUNCIL]),
                                                          end_time - start_time))
     return candidates_info
-
-
-def get_filled_party_column(soup):
-    """
-    A service function for filling 'Партія' column with values. Looks through rows except the first one for party name
-    and adds it to a list until finds out the next party name.
-    :param soup: BeautifulSoup object
-    :return filled_party_column: a list of strings
-    """
-    filled_party_column = list()
-    party = None
-    for _, value in enumerate(soup.select(SELECT_ROWS_IN_CANDIDATE_TABLE)):
-        if value.select(SELECT_PARTY_FROM_CANDIDATE_TABLE):
-            party = value.select(SELECT_PARTY_FROM_CANDIDATE_TABLE)[0].get_text()
-            continue
-        filled_party_column.append(party)
-    return filled_party_column[1:]
 
 
 def record_intermediate_result(candidates_info_dict):
